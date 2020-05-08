@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+
+<head>
+    <style>
+        /*basic reset*/
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0px;
+            padding: 0px;
+            background: black;
+            overflow: hidden;
+        }
+
+        #canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        var c = document.getElementById("canvas"), ctx = c.getContext("2d"), fontSize, lineHeight;
+
+        function init() {
+            // the canvas will have half the res of the window (for better perf)
+            c.height = window.innerHeight / 2;
+            c.width = window.innerWidth / 2;
+
+            // fill up the viewport with the canvas
+            c.setAttribute('height', window.innerHeight);
+            c.setAttribute('width', window.innerWidth);
+
+            // font size in vw (not pt nor px)
+            fontSize = 30;
+            ctx.font = fontSize + "vw arial";
+            ctx.textAlign = "center";
+
+            lineHeight = ctx.measureText('M').width;
+
+            ctx.fillStyle = "$000";
+            ctx.fillRect(0, 0, c.width, c.height);
+        };
+
+        function onDrawFrame(timestamp) {
+            ctx.save();
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0.5 * c.height - 0.5 * lineHeight, c.width, lineHeight * 1.1);
+
+            var ms = Math.floor(timestamp) % 60000;
+
+            ctx.fillStyle = "#FFF";
+            ctx.fillText(String("00000" + ms).slice(-5), 0.5 * c.width, 0.5 * c.height + 0.5 * lineHeight);
+            ctx.restore();
+
+            window.requestAnimationFrame(onDrawFrame); // schedule next frame's draw call
+        }
+
+        window.addEventListener("resize", init, false);
+        init();
+        window.requestAnimationFrame(onDrawFrame);        
+    </script>
+</body>
+
+</html>
