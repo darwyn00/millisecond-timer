@@ -28,43 +28,51 @@
     <script>
         var c = document.getElementById("canvas"), ctx = c.getContext("2d"), fontSize, lineHeight;
 
-        function init() {
-            // the canvas will have half the res of the window (for better perf)
-            c.height = window.innerHeight / 2;
-            c.width = window.innerWidth / 2;
-
+        function onReset() {
             // fill up the viewport with the canvas
-            c.setAttribute('height', window.innerHeight);
-            c.setAttribute('width', window.innerWidth);
+            c.height = window.innerHeight;
+            c.width = window.innerWidth;
 
             // font size in vw (not pt nor px)
             fontSize = 30;
-            ctx.font = fontSize + "vw arial";
+            ctx.font = fontSize + "vw 'Lucida Console', Monaco, monospace";
             ctx.textAlign = "center";
 
             lineHeight = ctx.measureText('M').width;
 
-            ctx.fillStyle = "$000";
-            ctx.fillRect(0, 0, c.width, c.height);
+            ctx.clearRect(0, 0, c.width, c.height);
+            ctx.fillStyle = "#FFF";
         };
 
         function onDrawFrame(timestamp) {
-            ctx.save();
-            ctx.fillStyle = "#000";
-            ctx.fillRect(0, 0.5 * c.height - 0.5 * lineHeight, c.width, lineHeight * 1.1);
-
+            ctx.save(); // pause painting while drawing the frame
+            ctx.clearRect(0, 0, c.width, c.height);
             var ms = Math.floor(timestamp) % 60000;
 
-            ctx.fillStyle = "#FFF";
             ctx.fillText(String("00000" + ms).slice(-5), 0.5 * c.width, 0.5 * c.height + 0.5 * lineHeight);
-            ctx.restore();
+            ctx.restore();  // resume painting
 
             window.requestAnimationFrame(onDrawFrame); // schedule next frame's draw call
         }
 
-        window.addEventListener("resize", init, false);
-        init();
-        window.requestAnimationFrame(onDrawFrame);        
+        function onDoubleClick() {
+            if (!document.fullscreenElement) {
+                c.requestFullscreen();
+                c.style.cursor = "none";
+
+            } else {
+                document.exitFullscreen();
+                c.style.cursor = "auto";
+            }
+        }
+
+        window.addEventListener("resize", onReset, false);
+        window.addEventListener("dblclick", onDoubleClick);
+        window.requestAnimationFrame(onDrawFrame);
+        window.addEventListener('DOMContentLoaded', (event) => {
+            onReset();
+        });
+
     </script>
 </body>
 
